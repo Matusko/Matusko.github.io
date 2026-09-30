@@ -28,9 +28,18 @@
     // click off to the OS as a real navigation, the OS intercepts the https://
     // URL before this page ever loads. Some in-app browsers (notably Facebook/
     // Messenger's WebView) never ask the OS at all, so verification never gets
-    // a chance to run — the button below is the manual escape hatch: an
-    // intent:// URI is special-cased by Chrome's WebView engine to launch an
-    // external app even from inside another app's embedded browser.
+    // a chance to run — the button below is the manual escape hatch.
+    //
+    // The intent:// URI targets the app's custom `tripplanner://` scheme, not
+    // `https`. Android App Link verification (matching assetlinks.json) runs as
+    // a background OS job at install time and doesn't always complete — e.g. a
+    // sideloaded/debug build can stay permanently unverified if the device had
+    // no connectivity at install time. On at least one Android build we've seen
+    // an *unverified* autoVerify https intent-filter get excluded even from an
+    // explicit-package match, so the fallback silently failed and dumped the
+    // user back into the browser via browser_fallback_url. The custom scheme
+    // has no autoVerify filter at all, so it isn't gated by verification state
+    // and resolves the same way on every device once the package is explicit.
     var match = location.pathname.match(/\/join\/([A-Za-z0-9]+)/);
     if (match) {
       var code = match[1];
@@ -41,8 +50,8 @@
 
       var fallback = encodeURIComponent(location.href);
       var btn = document.getElementById('openBtn');
-      btn.href = 'intent://matusko.github.io/join/' + code +
-        '#Intent;scheme=https;package=com.tripplanner;S.browser_fallback_url=' + fallback + ';end';
+      btn.href = 'intent://join/' + code +
+        '#Intent;scheme=tripplanner;package=com.tripplanner;S.browser_fallback_url=' + fallback + ';end';
       btn.style.display = 'inline-block';
     }
   </script>
