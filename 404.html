@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trip Planner</title>
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; background: #14151A; color: #fff;
+         display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
+  .card { max-width: 360px; text-align: center; }
+  h1 { font-size: 20px; margin-bottom: 8px; }
+  p { color: rgba(255,255,255,0.64); line-height: 1.5; }
+  code { background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 6px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="title">Trip Planner</h1>
+    <p id="message">Open this link on your Android phone with Trip Planner installed to join the trip.</p>
+  </div>
+  <script>
+    // GitHub Pages has no server-side routing, so any /join/<code> path lands
+    // here (served as 404 by GitHub, rendered normally by the browser). If
+    // Android App Links verification succeeded and the app is installed, the
+    // OS intercepts the https:// URL before this page ever loads — this is
+    // purely the fallback for everyone else (no app, iOS, desktop).
+    var match = location.pathname.match(/\/join\/([A-Za-z0-9]+)/);
+    if (match) {
+      document.getElementById('title').textContent = "You're invited!";
+      document.getElementById('message').innerHTML =
+        'Open this link on your Android phone with Trip Planner installed to join the trip. ' +
+        'Invite code: <code>' + match[1] + '</code>';
+    }
+  </script>
+</body>
+</html>
