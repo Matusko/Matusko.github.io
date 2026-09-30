@@ -9,27 +9,41 @@
          display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
   .card { max-width: 360px; text-align: center; }
   h1 { font-size: 20px; margin-bottom: 8px; }
-  p { color: rgba(255,255,255,0.64); line-height: 1.5; }
+  p { color: rgba(255,255,255,0.64); line-height: 1.5; margin-bottom: 20px; }
   code { background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 6px; }
+  .btn { display: none; background: #2F5BEA; color: #fff; text-decoration: none;
+         font-weight: 600; padding: 14px 28px; border-radius: 999px; }
 </style>
 </head>
 <body>
   <div class="card">
     <h1 id="title">Trip Planner</h1>
     <p id="message">Open this link on your Android phone with Trip Planner installed to join the trip.</p>
+    <a id="openBtn" class="btn" href="#">Open in Trip Planner</a>
   </div>
   <script>
     // GitHub Pages has no server-side routing, so any /join/<code> path lands
     // here (served as 404 by GitHub, rendered normally by the browser). If
-    // Android App Links verification succeeded and the app is installed, the
-    // OS intercepts the https:// URL before this page ever loads — this is
-    // purely the fallback for everyone else (no app, iOS, desktop).
+    // Android App Links verification succeeded AND the tapping app handed the
+    // click off to the OS as a real navigation, the OS intercepts the https://
+    // URL before this page ever loads. Some in-app browsers (notably Facebook/
+    // Messenger's WebView) never ask the OS at all, so verification never gets
+    // a chance to run — the button below is the manual escape hatch: an
+    // intent:// URI is special-cased by Chrome's WebView engine to launch an
+    // external app even from inside another app's embedded browser.
     var match = location.pathname.match(/\/join\/([A-Za-z0-9]+)/);
     if (match) {
+      var code = match[1];
       document.getElementById('title').textContent = "You're invited!";
       document.getElementById('message').innerHTML =
-        'Open this link on your Android phone with Trip Planner installed to join the trip. ' +
-        'Invite code: <code>' + match[1] + '</code>';
+        'Tap below to open Trip Planner and join the trip. ' +
+        'Invite code: <code>' + code + '</code>';
+
+      var fallback = encodeURIComponent(location.href);
+      var btn = document.getElementById('openBtn');
+      btn.href = 'intent://matusko.github.io/join/' + code +
+        '#Intent;scheme=https;package=com.tripplanner;S.browser_fallback_url=' + fallback + ';end';
+      btn.style.display = 'inline-block';
     }
   </script>
 </body>
